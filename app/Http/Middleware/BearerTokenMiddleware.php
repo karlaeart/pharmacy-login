@@ -19,8 +19,6 @@ class BearerTokenMiddleware
         if($request->header('Authorization')){
             return $next($request);
         }
-        return response()->json([
-            'message' => 'You are not authorized',
-        ]);
+        return redirect()->route('login');
     }
 }

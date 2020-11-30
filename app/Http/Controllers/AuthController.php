@@ -26,17 +26,16 @@ class AuthController extends Controller
 
     /**
      * Client Login
-     * @param Request $request
      * @return JsonResponse
      */
-    public function postLogin(Request $request)
+    public function postLogin()
     {
         // Validations
         $rules = [
             'email'=>'required|email',
             'password'=>'required|min:8'
         ];
-        $validator = Validator::make($request->all(), $rules);
+        $validator = Validator::make(request()->all(), $rules);
         if ($validator->fails()) {
             // Validation failed
             return response()->json([
@@ -44,16 +43,16 @@ class AuthController extends Controller
             ]);
         } else {
             // Fetch User
-            $user = User::where('email',$request->email)->first();
+            $user = User::where('email',request('email'))->first();
             if($user) {
                 // Verify the password
-                if( password_verify($request->password, $user->password) ) {
+                if( password_verify(request('password'), $user->password) ) {
                     // Update Token
                     $postArray = ['api_token' => $this->bearerToken];
-                    $login = User::where('email',$request->email)->update($postArray);
+                    $login = User::where('email',request('email'))->update($postArray);
 
                     if($login) {
-                        return response()->json([
+                        return redirect()->json([
                             'name'         => $user->name,
                             'email'        => $user->email,
                             'access_token' => $this->bearerToken,
@@ -74,12 +73,11 @@ class AuthController extends Controller
 
     /**
      * Logout
-     * @param Request $request
      * @return JsonResponse
      */
-    public function postLogout(Request $request)
+    public function postLogout()
     {
-        $token = $request->header('Authorization');
+        $token = request()->header('Authorization');
         $user = User::where('api_token',$token)->first();
         if($user) {
             $postArray = ['api_token' => null];
