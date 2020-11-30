@@ -15,6 +15,19 @@
 
 use Laravel\Lumen\Routing\Router;
 
-$router->get('/', 'HomeController@index');
 
-$router->get('/login','LoginController@index');
+//$router->get('/login','LoginController@index');
+
+$router->group(['prefix' => 'v1'], function () use ($router) {
+    // login
+    $router->post('/login','AuthController@postLogin');
+
+    // protected with Bearer Token Middleware
+    $router->group(['middleware', 'BearerTokenMiddleware'], function () use ($router) {
+        // logout
+        $router->post('/logout','AuthController@postLogout');
+        // home page
+        $router->get('/', 'HomeController@index');
+
+    });
+});
