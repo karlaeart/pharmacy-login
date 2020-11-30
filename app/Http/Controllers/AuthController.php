@@ -6,6 +6,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Str;
 use Laravel\Lumen\Http\Request;
 use Validator;
 
@@ -16,7 +17,11 @@ class AuthController extends Controller
     public function __construct()
     {
         // Unique Token
-        $this->bearerToken = uniqid(base64_encode(str_random(60)));
+        $this->bearerToken = uniqid(base64_encode(Str::random(60)));
+    }
+
+    public function getLogin() {
+        return view('auth.login');
     }
 
     /**
@@ -24,7 +29,7 @@ class AuthController extends Controller
      * @param Request $request
      * @return JsonResponse
      */
-    public function login(Request $request)
+    public function postLogin(Request $request)
     {
         // Validations
         $rules = [
@@ -72,7 +77,7 @@ class AuthController extends Controller
      * @param Request $request
      * @return JsonResponse
      */
-    public function logout(Request $request)
+    public function postLogout(Request $request)
     {
         $token = $request->header('Authorization');
         $user = User::where('api_token',$token)->first();
